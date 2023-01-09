@@ -21,8 +21,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import dagger.hilt.android.AndroidEntryPoint
+import hr.fika.budgeapp.balance.ui.BalanceScreen
 import hr.fika.budgeapp.ui.theme.BudgeAppTheme
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -42,7 +45,7 @@ class MainActivity : ComponentActivity() {
                         NavHost(navController = navController, startDestination = "balance") {
                             composable("budget") { Greeting("Budget") }
                             composable("investment") { Greeting("Invest") }
-                            composable("balance") { Greeting("Balance") }
+                            composable("balance") { BalanceScreen() }
                             composable("atms") { Greeting("ATMs") }
                             composable("account") { Greeting("Account") }
                         }

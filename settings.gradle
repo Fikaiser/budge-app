@@ -14,3 +14,7 @@ dependencyResolutionManagement {
 }
 rootProject.name = "BudgeApp"
 include ':app'
+include ':budgeapp:Balance'
+include ':balance'
+include ':design-system'
+include ':common'
