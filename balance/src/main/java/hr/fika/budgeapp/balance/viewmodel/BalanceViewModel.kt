@@ -9,12 +9,11 @@ import hr.fika.budgeapp.balance.network.BalanceRepository
 import kotlinx.coroutines.launch
 
 @HiltViewModel
-class BalanceViewModel : ViewModel() {
-    private val _test = MutableLiveData("")
+class BalanceViewModel() : ViewModel() {
+    private val _test = MutableLiveData("Hello Balance")
     val test: LiveData<String> = _test
-
     init {
-        getGreet()
+        // getGreet()
     }
 
     fun getGreet() {

@@ -54,8 +54,9 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.5.3")
 
     // modules
-    implementation project(':design-system')
-    implementation project(':common')
+    implementation project(':account')
     implementation project(':balance')
+    implementation project(':common')
+    implementation project(':design-system')
 
 }
