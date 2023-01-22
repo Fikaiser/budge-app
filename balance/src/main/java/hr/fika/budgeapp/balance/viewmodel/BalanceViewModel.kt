@@ -5,13 +5,16 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import hr.fika.budgeapp.balance.network.BalanceRepo
 import hr.fika.budgeapp.balance.network.BalanceRepository
+import hr.fika.budgeapp.balance.ui.BalanceUiState
+import hr.fika.budgeapp.common.user.dal.UserManager
 import kotlinx.coroutines.launch
 
 @HiltViewModel
 class BalanceViewModel() : ViewModel() {
-    private val _test = MutableLiveData("Hello Balance")
-    val test: LiveData<String> = _test
+    private val _viewState = MutableLiveData<BalanceUiState>(BalanceUiState.INITIAL)
+    val viewState: LiveData<BalanceUiState> = _viewState
     init {
         // getGreet()
     }
@@ -20,7 +23,16 @@ class BalanceViewModel() : ViewModel() {
         viewModelScope.launch {
             val result = BalanceRepository.getGreet()
             val text = result?: "Request failed"
-            _test.postValue(text)
+        }
+    }
+
+    fun linkBankAccount() {
+        _viewState.postValue(BalanceUiState.LOADING)
+        val userId = UserManager.user!!.idUser
+        viewModelScope.launch {
+            val repo = BalanceRepo()
+            val result = BalanceRepository.linkBankAccount(userId, 1)
+            _viewState.postValue(BalanceUiState.INCOME)
         }
     }
 }

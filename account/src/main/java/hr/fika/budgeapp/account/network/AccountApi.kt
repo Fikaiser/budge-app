@@ -1,7 +1,7 @@
 package hr.fika.budgeapp.account.network
 
+import hr.fika.budgeapp.common.user.model.User
 import retrofit2.Response
-import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 
@@ -18,5 +18,5 @@ interface AccountApi {
     suspend fun loginUser(
         @Query("email") email: String,
         @Query("hash") hash: String
-    ): Response<String>
+    ): Response<User>
 }

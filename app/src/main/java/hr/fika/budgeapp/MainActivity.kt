@@ -23,6 +23,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import hr.fika.budgeapp.account.ui.AccountScreen
+import hr.fika.budgeapp.atms.ui.AtmsScreen
 import hr.fika.budgeapp.balance.ui.BalanceScreen
 import hr.fika.budgeapp.ui.theme.BudgeAppTheme
 
@@ -47,10 +48,8 @@ class MainActivity : ComponentActivity() {
                             composable("budget") { Greeting("Budget") }
                             composable("investment") { Greeting("Invest") }
                             composable("balance") { BalanceScreen() }
-                            composable("atms") { Greeting("ATMs") }
+                            composable("atms") { AtmsScreen() }
                             composable("account") { AccountScreen() }
-                            composable("login") { Greeting("ATMs") }
-                            composable("register") { Greeting("ATMs") }
                         }
                     }
                 }

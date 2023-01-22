@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
 }
 
 android {
@@ -55,6 +56,7 @@ dependencies {
 
     // modules
     implementation project(':account')
+    implementation project(':atms')
     implementation project(':balance')
     implementation project(':common')
     implementation project(':design-system')

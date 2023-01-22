@@ -1,5 +1,7 @@
 package hr.fika.budgeapp.account.network
 
+import hr.fika.budgeapp.common.user.model.User
+
 object AccountRepository {
     suspend fun registerAccount(
         nickname: String,
@@ -15,7 +17,7 @@ object AccountRepository {
     suspend fun loginUser(
         email: String,
         hash: String
-    ) : String? {
+    ) : User? {
         return  AccountApiProvider
             .provideAccountApi()
             .loginUser(email, hash)
