@@ -7,7 +7,7 @@ data class User (
     @SerializedName("idUser") val idUser: Int,
     @SerializedName("nickname") val nickname: String,
     @SerializedName("token") val apiToken: String,
-    @SerializedName("bankAccount") val bankAccount: BankAccount? = null,
+    @SerializedName("bankAccount") var bankAccount: BankAccount? = null,
     @SerializedName("wallet") val cryptoWalletId: Int? = null,
     @SerializedName("portfolio") val stockPortfolioId: Int? = null,
 )

@@ -6,21 +6,21 @@ object AccountRepository {
     suspend fun registerAccount(
         nickname: String,
         email: String,
-        hash: String
+        pass: String
     ) : String? {
         return AccountApiProvider
             .provideAccountApi()
-            .registerAccount(nickname, email, hash)
+            .registerAccount(nickname, email, pass)
             .body()
     }
 
     suspend fun loginUser(
         email: String,
-        hash: String
+        pass: String
     ) : User? {
         return  AccountApiProvider
             .provideAccountApi()
-            .loginUser(email, hash)
+            .loginUser(email, pass)
             .body()
     }
 }

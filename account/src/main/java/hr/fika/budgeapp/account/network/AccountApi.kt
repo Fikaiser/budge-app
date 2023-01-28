@@ -11,12 +11,12 @@ interface AccountApi {
     suspend fun registerAccount(
         @Query("nickname") nickname: String,
         @Query("email") email: String,
-        @Query("hash") hash: String
+        @Query("pass") pass: String
     ): Response<String>
 
     @POST("/login")
     suspend fun loginUser(
         @Query("email") email: String,
-        @Query("hash") hash: String
+        @Query("pass") pass: String
     ): Response<User>
 }

@@ -2,6 +2,7 @@ package hr.fika.budgeapp
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.DrawableRes
@@ -14,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -22,10 +24,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import hr.fika.budgeapp.account.network.AccountRepository
 import hr.fika.budgeapp.account.ui.AccountScreen
 import hr.fika.budgeapp.atms.ui.AtmsScreen
 import hr.fika.budgeapp.balance.ui.BalanceScreen
+import hr.fika.budgeapp.common.sharedprefs.PreferenceKeys
+import hr.fika.budgeapp.common.sharedprefs.SharedPrefsManager
+import hr.fika.budgeapp.common.user.dal.UserManager
 import hr.fika.budgeapp.ui.theme.BudgeAppTheme
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -33,6 +40,8 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        SharedPrefsManager.init(this)
+        logInPreviousUser()
         setContent {
             val navController = rememberNavController()
             BudgeAppTheme {
@@ -52,6 +61,21 @@ class MainActivity : ComponentActivity() {
                             composable("account") { AccountScreen() }
                         }
                     }
+                }
+            }
+        }
+    }
+
+    private fun logInPreviousUser() {
+        val email = SharedPrefsManager.getString(PreferenceKeys.EMAIL)
+        val pass = SharedPrefsManager.getString(PreferenceKeys.PASSWORD)
+        if (!email.isNullOrBlank() && !pass.isNullOrBlank()) {
+            lifecycleScope.launch {
+                AccountRepository.loginUser(email, pass)
+                val result = AccountRepository.loginUser( email, pass)
+                if (result != null) {
+                    UserManager.user = result
+                    Log.d("ASDF", "User logged in")
                 }
             }
         }
