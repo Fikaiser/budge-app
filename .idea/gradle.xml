@@ -18,6 +18,7 @@
             <option value="$PROJECT_DIR$/budgeapp/Balance" />
             <option value="$PROJECT_DIR$/common" />
             <option value="$PROJECT_DIR$/design-system" />
+            <option value="$PROJECT_DIR$/investment" />
           </set>
         </option>
       </GradleProjectSettings>

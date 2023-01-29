@@ -31,6 +31,7 @@ import hr.fika.budgeapp.balance.ui.BalanceScreen
 import hr.fika.budgeapp.common.sharedprefs.PreferenceKeys
 import hr.fika.budgeapp.common.sharedprefs.SharedPrefsManager
 import hr.fika.budgeapp.common.user.dal.UserManager
+import hr.fika.budgeapp.investment.ui.InvestmentScreen
 import hr.fika.budgeapp.ui.theme.BudgeAppTheme
 import kotlinx.coroutines.launch
 
@@ -55,7 +56,7 @@ class MainActivity : ComponentActivity() {
                     ) {
                         NavHost(navController = navController, startDestination = "balance") {
                             composable("budget") { Greeting("Budget") }
-                            composable("investment") { Greeting("Invest") }
+                            composable("investment") { InvestmentScreen() }
                             composable("balance") { BalanceScreen() }
                             composable("atms") { AtmsScreen() }
                             composable("account") { AccountScreen() }

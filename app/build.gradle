@@ -60,5 +60,6 @@ dependencies {
     implementation project(':balance')
     implementation project(':common')
     implementation project(':design-system')
+    implementation project(':investment')
 
 }
