@@ -1,11 +1,10 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
-    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
 }
 
 android {
-    namespace 'hr.fika.budgeapp.atms'
+    namespace 'hr.fika.budgeapp.budget'
     compileSdk 32
 
     defaultConfig {
@@ -22,13 +21,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    buildFeatures {
-        compose true
-    }
-    composeOptions {
-        kotlinCompilerVersion '1.8.0'
-        kotlinCompilerExtensionVersion '1.4.1'
-    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -40,12 +32,9 @@ android {
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-
-    implementation 'com.google.maps.android:maps-compose:2.8.0'
-    implementation 'com.google.android.gms:play-services-maps:18.1.0'
-
     implementation project(':design-system')
     implementation project(':common')
+    implementation project(':balance')
+
+    // implementation ("com.github.DogusTeknoloji:compose-date-picker:1.1.0")
 }

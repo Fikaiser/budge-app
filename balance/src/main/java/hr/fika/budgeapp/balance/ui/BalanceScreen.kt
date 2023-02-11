@@ -37,7 +37,9 @@ fun BalanceScreen(
     val viewState = viewModel.viewState.observeAsState()
     val date = viewModel.date.observeAsState()
     val isRepeating = viewModel.isRepeating.observeAsState()
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,) {
         when (viewState.value) {
             BalanceUiState.LOADING -> LoadingAnimation3()
             BalanceUiState.INITIAL -> {

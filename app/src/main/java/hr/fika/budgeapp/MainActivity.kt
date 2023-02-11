@@ -14,7 +14,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -28,6 +27,7 @@ import hr.fika.budgeapp.account.network.AccountRepository
 import hr.fika.budgeapp.account.ui.AccountScreen
 import hr.fika.budgeapp.atms.ui.AtmsScreen
 import hr.fika.budgeapp.balance.ui.BalanceScreen
+import hr.fika.budgeapp.budget.ui.BudgetScreen
 import hr.fika.budgeapp.common.sharedprefs.PreferenceKeys
 import hr.fika.budgeapp.common.sharedprefs.SharedPrefsManager
 import hr.fika.budgeapp.common.user.dal.UserManager
@@ -55,7 +55,7 @@ class MainActivity : ComponentActivity() {
                         bottomBar = { Navigation(navController) }
                     ) {
                         NavHost(navController = navController, startDestination = "balance") {
-                            composable("budget") { Greeting("Budget") }
+                            composable("budget") { BudgetScreen() }
                             composable("investment") { InvestmentScreen() }
                             composable("balance") { BalanceScreen() }
                             composable("atms") { AtmsScreen() }
@@ -81,11 +81,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-}
-
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
 }
 
 sealed class Screen(
@@ -136,13 +131,5 @@ fun Navigation(navController: NavHostController) {
             )
 
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    BudgeAppTheme {
-        Greeting("Android")
     }
 }

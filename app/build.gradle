@@ -37,8 +37,8 @@ android {
         compose true
     }
     composeOptions {
-        kotlinCompilerVersion '1.7.20'
-        kotlinCompilerExtensionVersion '1.3.2'
+        kotlinCompilerVersion '1.8.0'
+        kotlinCompilerExtensionVersion '1.4.1'
     }
     packagingOptions {
         resources {
@@ -58,6 +58,7 @@ dependencies {
     implementation project(':account')
     implementation project(':atms')
     implementation project(':balance')
+    implementation project(':budget')
     implementation project(':common')
     implementation project(':design-system')
     implementation project(':investment')

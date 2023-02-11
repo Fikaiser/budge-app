@@ -7,6 +7,7 @@
         <option name="testRunner" value="GRADLE" />
         <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleJvm" value="Embedded JDK" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
@@ -16,6 +17,7 @@
             <option value="$PROJECT_DIR$/balance" />
             <option value="$PROJECT_DIR$/budgeapp" />
             <option value="$PROJECT_DIR$/budgeapp/Balance" />
+            <option value="$PROJECT_DIR$/budget" />
             <option value="$PROJECT_DIR$/common" />
             <option value="$PROJECT_DIR$/design-system" />
             <option value="$PROJECT_DIR$/investment" />

@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.himanshoe.charty.common.dimens.ChartDimens
 import com.himanshoe.charty.line.CurveLineChart
@@ -47,7 +48,9 @@ fun InvestmentScreen(viewModel: InvestmentViewModel = viewModel()) {
                 }
                 Box(modifier = Modifier.fillMaxSize()) {
                     CurveLineChart(
-                        modifier = Modifier.size(400.dp).align(Alignment.Center),
+                        modifier = Modifier
+                            .size(400.dp)
+                            .align(Alignment.Center),
                         lineData = points,
                         chartColor = Color.Green,
                         lineColor = Color.LightGray,
@@ -116,8 +119,11 @@ fun InvestmentScreen(viewModel: InvestmentViewModel = viewModel()) {
                     points.add(LineData(date.dayOfMonth.toFloat(), it.close!!.toFloat()))
                 }
                 Box(modifier = Modifier.fillMaxSize()) {
+                    Text(modifier = Modifier.align(Alignment.TopCenter), text = "ASSET: ADBE", fontSize = 24.sp)
                     CurveLineChart(
-                        modifier = Modifier.size(400.dp).align(Alignment.Center),
+                        modifier = Modifier
+                            .size(400.dp)
+                            .align(Alignment.Center),
                         lineData = points,
                         chartColor = Color.Green,
                         lineColor = Color.LightGray,

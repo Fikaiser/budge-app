@@ -1,15 +1,13 @@
 package hr.fika.budgeapp.account.ui
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,7 +45,9 @@ fun RegistrationForm(viewModel: AccountViewModel) {
     RoundedTextField("Nickname", viewModel)
     RoundedTextField("Password", viewModel, transformation = PasswordVisualTransformation())
     RoundedTextField("Repeat password", viewModel, transformation = PasswordVisualTransformation())
+    LabeledCheckBox(label = "I accept the terms and conditions" )
     BudgeButton("Register") { viewModel.registerAccount() }
+    Text(modifier = Modifier.padding(top = 280.dp), text = "Terms and conditions", color = Color.Blue)
 }
 
 @Composable
@@ -55,6 +55,17 @@ fun LoginForm(viewModel: AccountViewModel) {
     RoundedTextField("Email", viewModel)
     RoundedTextField("Password", viewModel, transformation = PasswordVisualTransformation())
     BudgeButton("Log In") { viewModel.loginUser() }
+}
+
+@Composable
+fun LabeledCheckBox(label: String) {
+    Row (verticalAlignment = Alignment.CenterVertically) {
+        Text(text = label)
+        Checkbox(
+            checked = false,
+            onCheckedChange = {
+            })
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

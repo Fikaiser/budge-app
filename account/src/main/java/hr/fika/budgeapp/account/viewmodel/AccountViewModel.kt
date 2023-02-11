@@ -19,11 +19,16 @@ class AccountViewModel : ViewModel() {
     val textFieldValues = mutableMapOf<String, String>()
 
     fun registerAccount() {
+        _viewState.postValue(AccountUiState.LOADING)
         val nickname = textFieldValues["Nickname"]!!
         val email = textFieldValues["Email"]!!
         val pass = textFieldValues["Password"]!!
         viewModelScope.launch {
             val result = AccountRepository.registerAccount(nickname, email, pass)
+            if (result != null) {
+                _viewState.postValue(AccountUiState.LOGIN)
+            }
+            _viewState.postValue(AccountUiState.ERROR)
         }
     }
 
