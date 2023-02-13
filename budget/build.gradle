@@ -28,13 +28,19 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    buildFeatures {
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerVersion '1.8.0'
+        kotlinCompilerExtensionVersion '1.4.1'
+    }
 }
 
 dependencies {
 
     implementation project(':design-system')
     implementation project(':common')
-    implementation project(':balance')
 
     // implementation ("com.github.DogusTeknoloji:compose-date-picker:1.1.0")
 }

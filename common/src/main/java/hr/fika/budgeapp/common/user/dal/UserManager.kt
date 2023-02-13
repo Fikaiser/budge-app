@@ -11,4 +11,13 @@ object UserManager {
         }
         return ""
     }
+
+    fun getUserBankAccount() : Int? {
+        user?.let {
+            it.bankAccount?.let {
+                return it.idBankAccount!!
+            }
+        }
+        return null
+    }
 }

@@ -16,5 +16,8 @@ object SharedPrefsManager {
     fun setString(key: PreferenceKeys, value: String) {
         sharedPreferences.edit().putString(key.name, value).apply()
     }
+    fun clearString(key: PreferenceKeys) {
+        sharedPreferences.edit().remove(key.name).apply()
+    }
 
 }
