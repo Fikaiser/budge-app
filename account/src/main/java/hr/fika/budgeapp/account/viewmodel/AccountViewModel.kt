@@ -1,12 +1,13 @@
 package hr.fika.budgeapp.account.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hr.fika.budgeapp.account.network.AccountRepository
 import hr.fika.budgeapp.account.ui.AccountUiState
+import hr.fika.budgeapp.common.analytics.AnalyticsManager
+import hr.fika.budgeapp.common.analytics.model.Event
 import hr.fika.budgeapp.common.sharedprefs.PreferenceKeys
 import hr.fika.budgeapp.common.sharedprefs.SharedPrefsManager
 import hr.fika.budgeapp.common.user.dal.UserManager
@@ -48,6 +49,7 @@ class AccountViewModel : ViewModel() {
         viewModelScope.launch {
             val result = AccountRepository.registerAccount(nickname, email, pass)
             if (result != null) {
+                AnalyticsManager.logEvent(Event.REGISTRATION)
                 _viewState.postValue(AccountUiState.LOGIN)
             }
             _viewState.postValue(AccountUiState.ERROR)
@@ -72,7 +74,7 @@ class AccountViewModel : ViewModel() {
             if (result != null) {
                 UserManager.user = result
                 _viewState.postValue(AccountUiState.LOGOUT)
-                Log.d("ASDF", "User logged in")
+                AnalyticsManager.logEvent(Event.LOGIN)
                 saveLoginInfo(email, hash)
             }
             else {

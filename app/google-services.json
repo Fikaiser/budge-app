@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "526868075837",
+    "project_id": "budgeapp",
+    "storage_bucket": "budgeapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:526868075837:android:5c19fa4b6e014c7558a154",
+        "android_client_info": {
+          "package_name": "hr.fika.budgeapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "526868075837-6l3a8o3805tmutnl7ljlkiafv9i83m3k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjXOZawIKL9bD-kR4xNgFpObOc9VNkTnM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "526868075837-6l3a8o3805tmutnl7ljlkiafv9i83m3k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -7,9 +7,13 @@ import okhttp3.Response
 class TokenInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request().newBuilder()
-            .header("Authorization","Bearer "+ UserManager.provideToken())
+            .header("Authorization", "Bearer " + UserManager.provideToken())
             .build()
 
-        return chain.proceed(request)
+        return try {
+            chain.proceed(request)
+        } catch (ex: java.lang.Exception) {
+            Response.Builder().code(500).build()
+        }
     }
 }

@@ -22,18 +22,25 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.work.*
 import dagger.hilt.android.AndroidEntryPoint
 import hr.fika.budgeapp.account.network.AccountRepository
 import hr.fika.budgeapp.account.ui.AccountScreen
 import hr.fika.budgeapp.atms.ui.AtmsScreen
 import hr.fika.budgeapp.balance.ui.BalanceScreen
 import hr.fika.budgeapp.budget.ui.BudgetScreen
+import hr.fika.budgeapp.common.analytics.AnalyticsManager
+import hr.fika.budgeapp.common.analytics.model.Event
+import hr.fika.budgeapp.common.notification.NotificationKeys
 import hr.fika.budgeapp.common.sharedprefs.PreferenceKeys
 import hr.fika.budgeapp.common.sharedprefs.SharedPrefsManager
 import hr.fika.budgeapp.common.user.dal.UserManager
 import hr.fika.budgeapp.investment.ui.InvestmentScreen
 import hr.fika.budgeapp.ui.theme.BudgeAppTheme
+import hr.fika.budgeapp.worker.BudgetOverspendWorker
+import hr.fika.budgeapp.worker.PendingPaymentWorker
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -42,7 +49,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         SharedPrefsManager.init(this)
+        AnalyticsManager.logEvent(Event.APP_START)
         logInPreviousUser()
+        startNotificationWorkers()
         setContent {
             val navController = rememberNavController()
             BudgeAppTheme {
@@ -64,6 +73,31 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
+        }
+    }
+
+    private fun startNotificationWorkers() {
+        UserManager.user?.let {
+            val workManager = WorkManager.getInstance(this)
+            val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .setRequiresBatteryNotLow(false)
+                .build()
+            val data = Data.Builder()
+            data.putInt(NotificationKeys.USER_ID.key, it.idUser)
+            it.bankAccount?.idBankAccount?.let { accountId ->
+                data.putInt(NotificationKeys.ACCOUNT_ID.key, accountId)
+                val overspendWorker = PeriodicWorkRequestBuilder<BudgetOverspendWorker>(1, TimeUnit.DAYS)
+                    .setConstraints(constraints)
+                    .setInputData(data.build())
+                    .build()
+                workManager.enqueue(overspendWorker)
+            }
+            val pendingPaymentWorker = PeriodicWorkRequestBuilder<PendingPaymentWorker>(1, TimeUnit.DAYS)
+                .setConstraints(constraints)
+                .setInputData(data.build())
+                .build()
+            workManager.enqueue(pendingPaymentWorker)
         }
     }
 

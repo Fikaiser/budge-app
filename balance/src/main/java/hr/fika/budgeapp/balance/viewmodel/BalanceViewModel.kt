@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hr.fika.budgeapp.balance.network.BalanceRepository
 import hr.fika.budgeapp.balance.ui.BalanceUiState
+import hr.fika.budgeapp.common.analytics.AnalyticsManager
+import hr.fika.budgeapp.common.analytics.model.Event
 import hr.fika.budgeapp.common.bank.model.Transaction
 import hr.fika.budgeapp.common.user.dal.UserManager
 import kotlinx.coroutines.launch
@@ -43,7 +45,10 @@ class BalanceViewModel() : ViewModel() {
             val accountId = UserManager.user!!.bankAccount
             viewModelScope.launch {
                 val result = BalanceRepository.getFlow(accountId!!.idBankAccount!!)
-                result?.let { _viewState.postValue(BalanceUiState.INCOME(it)) }
+                result?.let {
+                    AnalyticsManager.logEvent(Event.FLOW_LOADED)
+                    _viewState.postValue(BalanceUiState.INCOME(it))
+                }
             }
         }
     }
@@ -58,7 +63,10 @@ class BalanceViewModel() : ViewModel() {
             val accountId = UserManager.user!!.bankAccount
             viewModelScope.launch {
                 val result = BalanceRepository.getTransactions(accountId!!.idBankAccount!!)
-                result?.let { _viewState.postValue(BalanceUiState.TRANSACTIONS(it)) }
+                result?.let {
+                    AnalyticsManager.logEvent(Event.BALANCE_LOADED)
+                    _viewState.postValue(BalanceUiState.TRANSACTIONS(it))
+                }
             }
         }
     }
@@ -105,7 +113,9 @@ class BalanceViewModel() : ViewModel() {
             reoccurring = isRepeating.value,
             accountId = UserManager.user!!.bankAccount!!.idBankAccount
         )
+        val event = if (isRepeating.value!!) Event.FLOW_ADDED else Event.TRANSACTION_ADDED
         viewModelScope.launch {
+            AnalyticsManager.logEvent(event)
             val result = BalanceRepository.saveTransaction(transaction)
         }
     }

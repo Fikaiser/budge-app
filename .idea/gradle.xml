@@ -21,6 +21,7 @@
             <option value="$PROJECT_DIR$/common" />
             <option value="$PROJECT_DIR$/design-system" />
             <option value="$PROJECT_DIR$/investment" />
+            <option value="$PROJECT_DIR$/notification" />
           </set>
         </option>
       </GradleProjectSettings>

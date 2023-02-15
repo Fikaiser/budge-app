@@ -1,3 +1,8 @@
 package hr.fika.budgeapp.common.bank.model
 
-data class Bank (val idBank: Int, val name: String)
+import com.google.gson.annotations.SerializedName
+
+data class Bank (
+    @SerializedName("idBank") val idBank: Int,
+    @SerializedName("name") val name: String,
+)

@@ -8,12 +8,13 @@ import hr.fika.budgeapp.budget.model.Budget
 import hr.fika.budgeapp.budget.network.BudgetRepository
 import hr.fika.budgeapp.budget.ui.BudgetDatePickerState
 import hr.fika.budgeapp.budget.ui.BudgetUiState
+import hr.fika.budgeapp.common.analytics.AnalyticsManager
+import hr.fika.budgeapp.common.analytics.model.Event
 import hr.fika.budgeapp.common.bank.model.BudgetCalculationInfo
 import hr.fika.budgeapp.common.user.dal.UserManager
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 
@@ -68,12 +69,11 @@ class BudgetViewModel : ViewModel() {
 
     private fun getAmount() : Double {
         val amount = textFieldValues["Amount"]
-        return if (amount.isNullOrBlank()) 0.0 else amount.toDouble()!!
+        return if (amount.isNullOrBlank()) 0.0 else amount.toDouble()
     }
 
     private fun calculateProjection() : Double {
         val targetDate = date.value!!
-        val monthsBetween = ChronoUnit.MONTHS.between(LocalDate.now(), targetDate)
         var projection = 0.0
         for (transaction in calculationInfo.flow) {
             var comparisonDate = LocalDate.now()
@@ -99,6 +99,7 @@ class BudgetViewModel : ViewModel() {
                     userId = UserManager.user!!.idUser
                 )
             )
+            AnalyticsManager.logEvent(Event.BUDGET_CREATED)
             if (result.isNullOrBlank()) {
                 _viewState.postValue(BudgetUiState.ERROR)
             }
@@ -111,6 +112,7 @@ class BudgetViewModel : ViewModel() {
             with(UserManager) {
                 val budgets = BudgetRepository.getBudgets(getUserBankAccount()!!, user!!.idUser)
                 if (budgets != null) {
+                    AnalyticsManager.logEvent(Event.BUDGET_LOADED)
                     _viewState.postValue(BudgetUiState.BUDGETS(budgets))
                 } else {
                     _viewState.postValue(BudgetUiState.ERROR)

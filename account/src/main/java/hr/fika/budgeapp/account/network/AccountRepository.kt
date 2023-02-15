@@ -18,9 +18,13 @@ object AccountRepository {
         email: String,
         pass: String
     ) : User? {
-        return  AccountApiProvider
-            .provideAccountApi()
-            .loginUser(email, pass)
-            .body()
+        return try {
+            AccountApiProvider
+                .provideAccountApi()
+                .loginUser(email, pass)
+                .body()
+        } catch (ex: Exception) {
+            null
+        }
     }
 }

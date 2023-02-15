@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import hr.fika.budgeapp.common.analytics.AnalyticsManager
+import hr.fika.budgeapp.common.analytics.model.Event
 import hr.fika.budgeapp.common.user.dal.UserManager
 import hr.fika.budgeapp.investment.network.InvestmentRepository
 import hr.fika.budgeapp.investment.ui.InvestmentUiState
@@ -38,7 +40,10 @@ class InvestmentViewModel : ViewModel() {
         _viewState.postValue(InvestmentUiState.LOADING)
         viewModelScope.launch {
             val result = InvestmentRepository.getCryptoPriceHistory(tag, "7d")
-            result?.let { _viewState.postValue(InvestmentUiState.CRYPTO_GRAPH(it)) }
+            result?.let {
+            AnalyticsManager.logEvent(Event.CRYPTO_CHECKED)
+                _viewState.postValue(InvestmentUiState.CRYPTO_GRAPH(it))
+            }
         }
     }
 
@@ -67,7 +72,10 @@ class InvestmentViewModel : ViewModel() {
         _viewState.postValue(InvestmentUiState.LOADING)
         viewModelScope.launch {
             val result = InvestmentRepository.getStockPriceHistory(tag, "day")
-            result?.let { _viewState.postValue(InvestmentUiState.STOCKS_GRAPH(it)) }
+            result?.let {
+                AnalyticsManager.logEvent(Event.STOCK_CHECKED)
+                _viewState.postValue(InvestmentUiState.STOCKS_GRAPH(it))
+            }
         }
     }
 }
