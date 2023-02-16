@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -17,7 +18,14 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 
 @Composable
-fun LoadingAnimation3(
+fun LoadingAnimation3() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        LoadingAnimation()
+    }
+}
+
+@Composable
+fun LoadingAnimation(
     circleColor: Color = Color(0xFF35898F),
     circleSize: Dp = 36.dp,
     animationDelay: Int = 400,

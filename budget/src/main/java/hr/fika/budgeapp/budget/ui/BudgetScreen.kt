@@ -1,9 +1,15 @@
 package hr.fika.budgeapp.budget.ui
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -11,18 +17,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
+import hr.fika.budgeapp.budget.R
+import hr.fika.budgeapp.budget.model.BudgetProjection
 import hr.fika.budgeapp.budget.viewmodel.BudgetViewModel
 import hr.fika.budgeapp.design_system.theme.BudgeRoundedCorner
 import hr.fika.budgeapp.design_system.theme.CURRENCY
 import hr.fika.budgeapp.design_system.theme.budgeBlue
+import hr.fika.budgeapp.design_system.theme.budgeDarkBlue
 import hr.fika.budgeapp.design_system.ui.animation.LoadingAnimation3
 import hr.fika.budgeapp.design_system.ui.button.BudgeButton
 
 @OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun BudgetScreen(
     viewModel: BudgetViewModel = viewModel()
@@ -35,22 +48,41 @@ fun BudgetScreen(
             BudgetEditor(viewModel)
         }
         is BudgetUiState.ERROR -> TODO()
-        is BudgetUiState.INITIAL -> {
-            Column {
-                BudgeButton(text = "Add budget") {
-                    viewModel.navigateToEditor()
-                }
-                BudgeButton(text = "Get budgets") {
-                    viewModel.getBudgets()
-                }
-            }
-        }
         is BudgetUiState.LOADING -> LoadingAnimation3()
         null -> TODO()
         is BudgetUiState.BUDGETS -> {
             val budgets = (viewState.value as BudgetUiState.BUDGETS).budgets
-            budgets.forEach { 
-                Text(text = it.toString())
+            Scaffold(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.9f),
+                floatingActionButton = {
+                    FloatingActionButton(
+                        shape = BudgeRoundedCorner,
+                        containerColor = budgeDarkBlue,
+                        onClick = {
+                            viewModel.navigateToEditor()
+                        }
+                    ) {
+                        Icon(
+                            painter = rememberVectorPainter(Icons.Filled.Add),
+                            contentDescription = null
+                        )
+                    }
+                }
+            ) { _ ->
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.91f)
+                        .padding(top = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    items(budgets) {
+                        BudgetItem(budget = it, viewModel)
+                    }
+                }
             }
         }
     }
@@ -102,6 +134,84 @@ fun BudgetEditor(viewModel: BudgetViewModel) {
             viewModel.addBudget()
         }
         OnTargetText(isOnTarget = isOnTarget.value!!)
+    }
+}
+
+@Composable
+fun BudgetItem(budget: BudgetProjection, viewModel: BudgetViewModel) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth(0.95f)
+            .clickable {
+
+            }
+            .clip(BudgeRoundedCorner), color = budgeBlue
+    ) {
+        ConstraintLayout(modifier = Modifier) {
+            val statusText = if (budget.isOnTarget) "Budget on target" else "Budget missing target"
+            val vector = if (budget.isOnTarget) R.drawable.growth else R.drawable.decrease
+            val color = if (budget.isOnTarget) Color.Green else Color.Red
+            val (description, amount, date, delete, icon, status, change) = createRefs()
+            Text(
+                modifier = Modifier.constrainAs(description) {
+                    top.linkTo(parent.top, 8.dp)
+                    start.linkTo(parent.start, 8.dp)
+                },
+                text = budget.budget.description!!
+            )
+            Text(
+                modifier = Modifier.constrainAs(amount) {
+                    top.linkTo(description.bottom, 6.dp)
+                    start.linkTo(parent.start, 8.dp)
+                },
+                text = "${budget.budget.amount.toString()}€"
+            )
+            Text(
+                modifier = Modifier.constrainAs(date) {
+                    top.linkTo(amount.bottom, 6.dp)
+                    start.linkTo(parent.start, 8.dp)
+                },
+                text = budget.getDate()
+            )
+            Icon(
+                modifier = Modifier
+                    .clickable {viewModel.deleteBudget(budget.budget.idBudget!!)}
+                    .constrainAs(delete) {
+                        top.linkTo(date.top)
+                        end.linkTo(parent.end, 8.dp)
+                    },
+                painter = rememberVectorPainter(Icons.Filled.Delete),
+                contentDescription = null
+            )
+            Icon(
+                modifier = Modifier
+                    .size(38.dp)
+                    .constrainAs(icon) {
+                        top.linkTo(parent.top, 8.dp)
+                        end.linkTo(parent.end, 8.dp)
+                    },
+                painter = painterResource(id = vector),
+                tint = color,
+                contentDescription = null
+            )
+            Text(
+                modifier = Modifier.constrainAs(status) {
+                    top.linkTo(date.bottom, 6.dp)
+                    start.linkTo(parent.start, 8.dp)
+                },
+                text = statusText,
+                color = color
+            )
+            Text(
+                modifier = Modifier
+                    .padding(bottom = 8.dp)
+                    .constrainAs(change) {
+                        top.linkTo(status.bottom, 6.dp)
+                        start.linkTo(parent.start, 8.dp)
+                    },
+                text = "Projected total: ${budget.change}€"
+            )
+        }
     }
 }
 

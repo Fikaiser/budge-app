@@ -1,12 +1,10 @@
 package hr.fika.budgeapp.budget.ui
 
-import hr.fika.budgeapp.budget.model.Budget
-import hr.fika.budgeapp.common.bank.model.Transaction
+import hr.fika.budgeapp.budget.model.BudgetProjection
 
 sealed class BudgetUiState {
     object LOADING : BudgetUiState()
-    object INITIAL : BudgetUiState()
-    data class BUDGETS(val budgets: List<Budget>) : BudgetUiState()
+    data class BUDGETS(val budgets: List<BudgetProjection>) : BudgetUiState()
     object EDITOR : BudgetUiState()
     object ERROR : BudgetUiState()
 }

@@ -16,10 +16,9 @@ import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
-import java.time.temporal.ChronoUnit
 
 class BudgetViewModel : ViewModel() {
-    private val _viewState = MutableLiveData<BudgetUiState>(BudgetUiState.INITIAL)
+    private val _viewState = MutableLiveData<BudgetUiState>(BudgetUiState.LOADING)
     val viewState: LiveData<BudgetUiState> = _viewState
     private val _dateState = MutableLiveData<BudgetDatePickerState>(BudgetDatePickerState.HIDDEN)
     val dateState: LiveData<BudgetDatePickerState> = _dateState
@@ -39,7 +38,10 @@ class BudgetViewModel : ViewModel() {
         viewModelScope.launch {
             UserManager.getUserBankAccount()?.let { accountId ->
                 val info = BudgetRepository.getCalculationInfo(accountId)
-                info?.let { calculationInfo = it }
+                info?.let {
+                    calculationInfo = it
+                    getBudgets()
+                }
             }
         }
     }
@@ -67,18 +69,19 @@ class BudgetViewModel : ViewModel() {
         _onTarget.postValue(calculateProjection() > getAmount())
     }
 
-    private fun getAmount() : Double {
+    private fun getAmount(): Double {
         val amount = textFieldValues["Amount"]
         return if (amount.isNullOrBlank()) 0.0 else amount.toDouble()
     }
 
-    private fun calculateProjection() : Double {
+    private fun calculateProjection(): Double {
         val targetDate = date.value!!
         var projection = 0.0
         for (transaction in calculationInfo.flow) {
             var comparisonDate = LocalDate.now()
             val transactionDate = Instant.ofEpochMilli(transaction.transactionTimestamp!!).atZone(
-                ZoneId.systemDefault()).toLocalDate()
+                ZoneId.systemDefault()
+            ).toLocalDate()
             while (comparisonDate.isBefore(targetDate)) {
                 if (transactionDate.dayOfMonth < comparisonDate.dayOfMonth) {
                     projection += transaction.amount!!
@@ -95,12 +98,15 @@ class BudgetViewModel : ViewModel() {
                 Budget(
                     description = textFieldValues["Description"],
                     amount = getAmount(),
-                    budgetDate = date.value!!.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli(),
+                    budgetDate = date.value!!.atStartOfDay(ZoneId.systemDefault()).toInstant()
+                        .toEpochMilli(),
                     userId = UserManager.user!!.idUser
                 )
             )
             AnalyticsManager.logEvent(Event.BUDGET_CREATED)
-            if (result.isNullOrBlank()) {
+            if (!result.isNullOrBlank()) {
+                getBudgets()
+            } else {
                 _viewState.postValue(BudgetUiState.ERROR)
             }
         }
@@ -118,6 +124,18 @@ class BudgetViewModel : ViewModel() {
                     _viewState.postValue(BudgetUiState.ERROR)
                 }
             }
+        }
+    }
+
+    fun deleteBudget(idBudget: Int) {
+        _viewState.postValue(BudgetUiState.LOADING)
+        viewModelScope.launch {
+            val response = BudgetRepository.deleteBudget(idBudget)
+            if (!response.isNullOrEmpty()) {
+                getBudgets()
+                return@launch
+            }
+            _viewState.postValue(BudgetUiState.ERROR)
         }
     }
 
