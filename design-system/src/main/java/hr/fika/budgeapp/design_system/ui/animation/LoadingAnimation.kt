@@ -15,6 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import hr.fika.budgeapp.design_system.theme.budgeDarkBlue
 import kotlinx.coroutines.delay
 
 @Composable
@@ -26,7 +27,7 @@ fun LoadingAnimation3() {
 
 @Composable
 fun LoadingAnimation(
-    circleColor: Color = Color(0xFF35898F),
+    circleColor: Color = budgeDarkBlue,
     circleSize: Dp = 36.dp,
     animationDelay: Int = 400,
     initialAlpha: Float = 0.3f

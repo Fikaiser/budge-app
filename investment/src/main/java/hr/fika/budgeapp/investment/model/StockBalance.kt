@@ -9,4 +9,6 @@ data class StockBalance (
     @SerializedName("portfolioId")val portfolioId: Int? = null,
     @SerializedName("icon")val iconUrl: String? = null,
     @SerializedName("price") var price: Double? = null
-)
+) {
+    fun toAsset() : Asset = Asset(tag!!, amount!!, price!!, iconUrl!!)
+}

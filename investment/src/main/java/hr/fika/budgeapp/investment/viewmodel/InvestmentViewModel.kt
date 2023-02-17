@@ -7,13 +7,21 @@ import androidx.lifecycle.viewModelScope
 import hr.fika.budgeapp.common.analytics.AnalyticsManager
 import hr.fika.budgeapp.common.analytics.model.Event
 import hr.fika.budgeapp.common.user.dal.UserManager
+import hr.fika.budgeapp.investment.model.CryptoBalance
+import hr.fika.budgeapp.investment.model.StockBalance
 import hr.fika.budgeapp.investment.network.InvestmentRepository
 import hr.fika.budgeapp.investment.ui.InvestmentUiState
+import hr.fika.budgeapp.investment.ui.AssetType
 import kotlinx.coroutines.launch
 
 class InvestmentViewModel : ViewModel() {
     private val _viewState = MutableLiveData<InvestmentUiState>(InvestmentUiState.INITIAL)
     val viewState: LiveData<InvestmentUiState> = _viewState
+    private var stocks = listOf<StockBalance>()
+    private var crypto = listOf<CryptoBalance>()
+
+    private val _period = MutableLiveData("Week")
+    val period: LiveData<String> = _period
 
     fun linkCryptoWallet() {
         _viewState.postValue(InvestmentUiState.LOADING)
@@ -29,20 +37,28 @@ class InvestmentViewModel : ViewModel() {
 
     fun getCryptoBalances() {
         _viewState.postValue(InvestmentUiState.LOADING)
-        viewModelScope.launch {
-            val walletId = UserManager.user!!.cryptoWalletId
-            val result = InvestmentRepository.getCryptoBalances(walletId!!)
-            result?.let { _viewState.postValue(InvestmentUiState.CRYPTO(it)) }
+        if (crypto.isEmpty()) {
+            viewModelScope.launch {
+                val walletId = UserManager.user!!.cryptoWalletId
+                val result = InvestmentRepository.getCryptoBalances(walletId!!)
+                result?.let {
+                    crypto = it
+                    _viewState.postValue(InvestmentUiState.CRYPTO(it))
+                }
+            }
+        } else {
+            _viewState.postValue(InvestmentUiState.CRYPTO(crypto))
         }
     }
 
-    fun getCryptoPriceHistory(tag: String) {
+    fun getCryptoPriceHistory(tag: String, period: PricePeriod = PricePeriod.WEEK) {
         _viewState.postValue(InvestmentUiState.LOADING)
         viewModelScope.launch {
-            val result = InvestmentRepository.getCryptoPriceHistory(tag, "7d")
+            val result = InvestmentRepository.getCryptoPriceHistory(tag, period.value)
             result?.let {
-            AnalyticsManager.logEvent(Event.CRYPTO_CHECKED)
-                _viewState.postValue(InvestmentUiState.CRYPTO_GRAPH(it))
+                AnalyticsManager.logEvent(Event.CRYPTO_CHECKED)
+                _period.postValue(period.title)
+                _viewState.postValue(InvestmentUiState.CRYPTO_GRAPH(it, tag))
             }
         }
     }
@@ -61,21 +77,43 @@ class InvestmentViewModel : ViewModel() {
 
     fun getStockBalances() {
         _viewState.postValue(InvestmentUiState.LOADING)
+        if (stocks.isEmpty()) {
+            viewModelScope.launch {
+                val portfolioId = UserManager.user!!.stockPortfolioId
+                val result = InvestmentRepository.getStockBalances(portfolioId!!)
+                result?.let {
+                    stocks = it
+                    _viewState.postValue(InvestmentUiState.STOCKS(it))
+                }
+            }
+        } else {
+            _viewState.postValue(InvestmentUiState.STOCKS(stocks))
+        }
+
+    }
+
+    fun getStockPriceHistory(tag: String, period: PricePeriod = PricePeriod.WEEK) {
+        _viewState.postValue(InvestmentUiState.LOADING)
         viewModelScope.launch {
-            val portfolioId = UserManager.user!!.stockPortfolioId
-            val result = InvestmentRepository.getStockBalances(portfolioId!!)
-            result?.let { _viewState.postValue(InvestmentUiState.STOCKS(it)) }
+            val result = InvestmentRepository.getStockPriceHistory(tag, period.value)
+            result?.let {
+                AnalyticsManager.logEvent(Event.STOCK_CHECKED)
+                _period.postValue(period.title)
+                _viewState.postValue(InvestmentUiState.STOCKS_GRAPH(it, tag))
+            }
         }
     }
 
-    fun getStockPriceHistory(tag: String) {
-        _viewState.postValue(InvestmentUiState.LOADING)
-        viewModelScope.launch {
-            val result = InvestmentRepository.getStockPriceHistory(tag, "day")
-            result?.let {
-                AnalyticsManager.logEvent(Event.STOCK_CHECKED)
-                _viewState.postValue(InvestmentUiState.STOCKS_GRAPH(it))
-            }
+    fun loadData(type: AssetType) {
+        when (type) {
+            AssetType.STOCKS -> getStockBalances()
+            AssetType.CRYPTO -> getCryptoBalances()
         }
+    }
+
+    enum class PricePeriod(val title: String, val value: String) {
+        WEEK("Week", "week"),
+        MONTH("Month", "month"),
+        YEAR("Year", "year");
     }
 }
