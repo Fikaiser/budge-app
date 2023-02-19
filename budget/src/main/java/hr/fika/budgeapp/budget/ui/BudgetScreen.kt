@@ -33,6 +33,7 @@ import hr.fika.budgeapp.design_system.theme.budgeBlue
 import hr.fika.budgeapp.design_system.theme.budgeDarkBlue
 import hr.fika.budgeapp.design_system.ui.animation.LoadingAnimation3
 import hr.fika.budgeapp.design_system.ui.button.BudgeButton
+import hr.fika.budgeapp.design_system.ui.error.ErrorScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -47,7 +48,7 @@ fun BudgetScreen(
         is BudgetUiState.EDITOR -> {
             BudgetEditor(viewModel)
         }
-        is BudgetUiState.ERROR -> TODO()
+        is BudgetUiState.ERROR -> ErrorScreen()
         is BudgetUiState.LOADING -> LoadingAnimation3()
         null -> TODO()
         is BudgetUiState.BUDGETS -> {
@@ -175,7 +176,7 @@ fun BudgetItem(budget: BudgetProjection, viewModel: BudgetViewModel) {
             )
             Icon(
                 modifier = Modifier
-                    .clickable {viewModel.deleteBudget(budget.budget.idBudget!!)}
+                    .clickable { viewModel.deleteBudget(budget.budget.idBudget!!) }
                     .constrainAs(delete) {
                         top.linkTo(date.top)
                         end.linkTo(parent.end, 8.dp)

@@ -23,6 +23,7 @@ import hr.fika.budgeapp.account.viewmodel.AccountViewModel
 import hr.fika.budgeapp.design_system.theme.BudgeRoundedCorner
 import hr.fika.budgeapp.design_system.ui.animation.LoadingAnimation3
 import hr.fika.budgeapp.design_system.ui.button.BudgeButton
+import hr.fika.budgeapp.design_system.ui.error.ErrorScreen
 
 @Preview
 @Composable
@@ -35,7 +36,7 @@ fun AccountScreen(
         AccountUiState.LOGIN -> LoginForm(viewModel = viewModel)
         AccountUiState.REGISTER -> RegistrationForm(viewModel = viewModel)
         AccountUiState.LOGOUT -> LogoutScreen(viewModel = viewModel)
-        else -> {}
+        else -> ErrorScreen()
     }
 }
 

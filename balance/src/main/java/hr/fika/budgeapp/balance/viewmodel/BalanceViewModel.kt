@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hr.fika.budgeapp.balance.network.BalanceRepository
 import hr.fika.budgeapp.balance.ui.BalanceUiState
+import hr.fika.budgeapp.balance.ui.TransactionType
 import hr.fika.budgeapp.common.analytics.AnalyticsManager
 import hr.fika.budgeapp.common.analytics.model.Event
 import hr.fika.budgeapp.common.bank.model.Transaction
@@ -16,14 +17,15 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneOffset
+import kotlin.random.Random
 
 @HiltViewModel
 class BalanceViewModel() : ViewModel() {
-    private val _viewState = MutableLiveData<BalanceUiState>(BalanceUiState.INITIAL)
+    private val _viewState = MutableLiveData<BalanceUiState>(BalanceUiState.LOADING)
     val viewState: LiveData<BalanceUiState> = _viewState
 
-    private lateinit var innerDate : LocalDate
-    private lateinit var innerTime : LocalTime
+    private lateinit var innerDate: LocalDate
+    private lateinit var innerTime: LocalTime
     private val _date = MutableLiveData(LocalDateTime.now())
     val date: LiveData<LocalDateTime> = _date
     private val _isRepeating = MutableLiveData(false)
@@ -32,10 +34,10 @@ class BalanceViewModel() : ViewModel() {
     val textFieldValues = mutableMapOf<String, String>()
 
     init {
-        UserManager.user?.let {
-            it.bankAccount?.let {
-                getTransactions()
-            }
+        if (UserManager.user!!.bankAccount != null) {
+            getTransactions()
+        } else {
+            _viewState.postValue(BalanceUiState.DIALOG)
         }
     }
 
@@ -75,12 +77,12 @@ class BalanceViewModel() : ViewModel() {
         _viewState.postValue(BalanceUiState.LOADING)
         val userId = UserManager.user!!.idUser
         viewModelScope.launch {
-            val result = BalanceRepository.linkBankAccount(userId, 1)
+            val result = BalanceRepository.linkBankAccount(userId, Random.nextInt(1, 3))
             result?.let {
                 UserManager.user!!.bankAccount = it
                 getTransactions()
             }
-            getFlow()
+            getTransactions()
         }
     }
 
@@ -100,6 +102,7 @@ class BalanceViewModel() : ViewModel() {
     fun deleteTransaction(transactionId: Int) {
         viewModelScope.launch {
             val result = BalanceRepository.deleteTransaction(transactionId)
+            getFlow()
         }
     }
 
@@ -117,6 +120,14 @@ class BalanceViewModel() : ViewModel() {
         viewModelScope.launch {
             AnalyticsManager.logEvent(event)
             val result = BalanceRepository.saveTransaction(transaction)
+            getFlow()
+        }
+    }
+
+    fun loadData(type: TransactionType) {
+        when (type) {
+            TransactionType.TRANSACTIONS -> getTransactions()
+            TransactionType.FLOW -> getFlow()
         }
     }
 }

@@ -4,7 +4,7 @@ import hr.fika.budgeapp.common.bank.model.Transaction
 
 sealed class BalanceUiState {
     object LOADING : BalanceUiState()
-    object INITIAL : BalanceUiState()
+    object DIALOG : BalanceUiState()
     data class TRANSACTIONS(val transactions: List<Transaction>) : BalanceUiState()
     data class INCOME(val transactions: List<Transaction>) : BalanceUiState()
     object EDITOR : BalanceUiState()

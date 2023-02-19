@@ -2,10 +2,7 @@ package hr.fika.budgeapp.design_system.ui.text
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,5 +27,21 @@ fun RoundedText(text: String, modifier: Modifier = Modifier, onClick: () -> Unit
                 .align(Alignment.CenterStart)
                 .padding(start = 18.dp), text = text
         )
+    }
+}
+
+@Composable
+fun LabeledRoundedText(label: String, text: String, onClick: () -> Unit = {}) {
+    Column {
+        Text(modifier = Modifier.padding(start = 18.dp), text = label)
+        RoundedText(text = text, onClick = onClick)
+    }
+}
+
+@Composable
+fun LabeledRoundedTextField(label: String, roundedTextField: @Composable () -> Unit) {
+    Column {
+        Text(modifier = Modifier.padding(start = 18.dp), text = label)
+        roundedTextField()
     }
 }

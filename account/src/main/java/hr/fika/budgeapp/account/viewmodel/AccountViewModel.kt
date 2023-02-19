@@ -48,11 +48,12 @@ class AccountViewModel : ViewModel() {
         val pass = textFieldValues["Password"]!!
         viewModelScope.launch {
             val result = AccountRepository.registerAccount(nickname, email, pass)
-            if (result != null) {
+            if (!result.isNullOrBlank()) {
                 AnalyticsManager.logEvent(Event.REGISTRATION)
                 _viewState.postValue(AccountUiState.LOGIN)
-            }
+            } else {
             _viewState.postValue(AccountUiState.ERROR)
+            }
         }
     }
 

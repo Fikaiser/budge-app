@@ -20,14 +20,15 @@ import coil.compose.AsyncImage
 import com.himanshoe.charty.common.dimens.ChartDimens
 import com.himanshoe.charty.line.CurveLineChart
 import com.himanshoe.charty.line.model.LineData
+import hr.fika.budgeapp.common.extensions.roundDouble
 import hr.fika.budgeapp.design_system.theme.BudgeRoundedCorner
 import hr.fika.budgeapp.design_system.theme.budgeBlue
 import hr.fika.budgeapp.design_system.ui.animation.LoadingAnimation3
 import hr.fika.budgeapp.design_system.ui.button.BudgeButton
+import hr.fika.budgeapp.design_system.ui.error.ErrorScreen
 import hr.fika.budgeapp.design_system.ui.text.RoundedText
 import hr.fika.budgeapp.investment.model.*
 import hr.fika.budgeapp.investment.viewmodel.InvestmentViewModel
-import java.math.RoundingMode
 
 data class TabItem(val title: String, val type: AssetType)
 enum class AssetType { STOCKS, CRYPTO }
@@ -61,7 +62,7 @@ fun InvestmentScreen(viewModel: InvestmentViewModel = viewModel()) {
             (viewState.value as InvestmentUiState.CRYPTO_GRAPH).tag,
             viewModel
         )
-        InvestmentUiState.ERROR -> {}
+        InvestmentUiState.ERROR -> ErrorScreen()
         InvestmentUiState.INITIAL -> {}
         InvestmentUiState.LOADING -> LoadingAnimation3()
         is InvestmentUiState.STOCKS -> StocksTable(
@@ -218,7 +219,7 @@ fun AssetItem(asset: Asset, viewModel: InvestmentViewModel, type: AssetType) {
                     top.linkTo(parent.top, 8.dp)
                     start.linkTo(tag.end, 8.dp)
                 },
-                text = "${roundDouble(asset.price)}€"
+                text = "${asset.price.roundDouble()}€"
             )
             Text(
                 modifier = Modifier.constrainAs(amount) {
@@ -234,7 +235,7 @@ fun AssetItem(asset: Asset, viewModel: InvestmentViewModel, type: AssetType) {
                         top.linkTo(tag.bottom, 4.dp)
                         start.linkTo(amount.end, 8.dp)
                     },
-                text = "- Total: ${roundDouble(asset.amount * asset.price)}€"
+                text = "- Total: ${(asset.amount * asset.price).roundDouble()}€"
             )
             AsyncImage(
                 modifier = Modifier
@@ -294,9 +295,3 @@ fun LinkDialog(viewModel: InvestmentViewModel) {
         )
     }
 }
-
-
-private fun roundDouble(number: Double) = number
-    .toBigDecimal()
-    .setScale(2, RoundingMode.DOWN)
-    .toDouble()
