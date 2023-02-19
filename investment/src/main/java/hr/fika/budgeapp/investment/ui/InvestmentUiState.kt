@@ -7,7 +7,7 @@ import hr.fika.budgeapp.investment.model.StockBalance
 
 sealed class InvestmentUiState {
     object LOADING : InvestmentUiState()
-    object INITIAL : InvestmentUiState()
+    data class DIALOG(val type: AssetType) : InvestmentUiState()
     data class CRYPTO(val balances: List<CryptoBalance>) : InvestmentUiState()
     data class CRYPTO_GRAPH(val history: HistoricalCoinPrice, val tag: String) : InvestmentUiState()
     data class STOCKS(val balances: List<StockBalance>) : InvestmentUiState()

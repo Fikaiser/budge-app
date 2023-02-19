@@ -2,6 +2,7 @@ package hr.fika.budgeapp.account.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material3.*
@@ -13,6 +14,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -89,10 +91,22 @@ fun RegistrationForm(viewModel: AccountViewModel) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            RoundedTextField("Email", viewModel)
+            RoundedTextField(
+                "Email",
+                viewModel,
+                keyboardType = KeyboardType.Email
+            )
             RoundedTextField("Nickname", viewModel)
-            RoundedTextField("Password", viewModel, transformation = PasswordVisualTransformation())
-            RoundedTextField("Repeat password", viewModel, transformation = PasswordVisualTransformation())
+            RoundedTextField(
+                "Password",
+                viewModel,
+                transformation = PasswordVisualTransformation()
+            )
+            RoundedTextField(
+                "Repeat password",
+                viewModel,
+                transformation = PasswordVisualTransformation()
+            )
             LabeledCheckBox(label = "I accept the terms and conditions" )
             BudgeButton("Register") { viewModel.registerAccount() }
         }
@@ -129,7 +143,11 @@ fun LoginForm(viewModel: AccountViewModel) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            RoundedTextField("Email", viewModel)
+            RoundedTextField(
+                "Email",
+                viewModel,
+                keyboardType = KeyboardType.Email
+            )
             RoundedTextField(
                 "Password",
                 viewModel,
@@ -196,6 +214,7 @@ fun RoundedTextField(
     placeholder: String,
     viewModel: AccountViewModel,
     modifier: Modifier = Modifier,
+    keyboardType: KeyboardType = KeyboardType.Text,
     transformation : VisualTransformation = VisualTransformation.None,
 ) {
     var value by remember { mutableStateOf("") }
@@ -207,6 +226,7 @@ fun RoundedTextField(
         value = value,
         placeholder = {Text(text = placeholder)},
         visualTransformation = transformation,
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         onValueChange =  {
             value = it
             viewModel.textFieldValues[placeholder] = it

@@ -24,7 +24,6 @@ import hr.fika.budgeapp.common.extensions.roundDouble
 import hr.fika.budgeapp.design_system.theme.BudgeRoundedCorner
 import hr.fika.budgeapp.design_system.theme.budgeBlue
 import hr.fika.budgeapp.design_system.ui.animation.LoadingAnimation3
-import hr.fika.budgeapp.design_system.ui.button.BudgeButton
 import hr.fika.budgeapp.design_system.ui.error.ErrorScreen
 import hr.fika.budgeapp.design_system.ui.text.RoundedText
 import hr.fika.budgeapp.investment.model.*
@@ -63,7 +62,10 @@ fun InvestmentScreen(viewModel: InvestmentViewModel = viewModel()) {
             viewModel
         )
         InvestmentUiState.ERROR -> ErrorScreen()
-        InvestmentUiState.INITIAL -> {}
+        is InvestmentUiState.DIALOG -> LinkDialog(
+            viewModel,
+            (viewState.value as InvestmentUiState.DIALOG).type
+        )
         InvestmentUiState.LOADING -> LoadingAnimation3()
         is InvestmentUiState.STOCKS -> StocksTable(
             (viewState.value as InvestmentUiState.STOCKS).balances,
@@ -254,44 +256,35 @@ fun AssetItem(asset: Asset, viewModel: InvestmentViewModel, type: AssetType) {
 }
 
 @Composable
-fun LinkDialog(viewModel: InvestmentViewModel) {
+fun LinkDialog(viewModel: InvestmentViewModel, type: AssetType) {
     var shouldShowDialog by remember { mutableStateOf(false) }
-    var isCrypto by remember { mutableStateOf(false) }
-    BudgeButton(text = "Link crypto wallet") {
-        shouldShowDialog = true
-        isCrypto = true
+    var dialogTitle = ""
+    var dialogBody = ""
+    when (type) {
+        AssetType.STOCKS -> {
+            dialogTitle = "Link stock portfolio"
+            dialogBody = "Would you like to link your stock portfolio"
+        }
+        AssetType.CRYPTO -> {
+            dialogTitle = "Link crypto wallet"
+            dialogBody = "Would you like to link your crypto wallet"
+        }
     }
-    BudgeButton(text = "Link stock portfolio") {
-        shouldShowDialog = true
-        isCrypto = false
-    }
-    BudgeButton(text = "Get crypto balances") {
-        viewModel.getCryptoBalances()
-    }
+    val isCrypto = type == AssetType.CRYPTO
+    AlertDialog(
+        onDismissRequest = { },
+        title = { Text(text = dialogTitle)},
+        text = { Text(text = dialogBody)},
+        confirmButton = {
+            TextButton(onClick = {
+                if (isCrypto) viewModel.linkCryptoWallet() else viewModel.linkStockPortfolio()
+            })
+            { Text(text = "Yes") }
+        },
+        dismissButton = {
+            TextButton(onClick = { shouldShowDialog = false })
+            { Text(text = "No") }
+        }
+    )
 
-    BudgeButton(text = "Get stock balances") {
-        viewModel.getStockBalances()
-    }
-
-    if (shouldShowDialog) {
-        AlertDialog(
-            onDismissRequest = { },
-            title = {
-                Text(text = "Link crypto wallet")
-            },
-            text = {
-                Text(text = "Would you like to link your crypto wallet")
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    if (isCrypto) viewModel.linkCryptoWallet() else viewModel.linkStockPortfolio()
-                })
-                { Text(text = "Yes") }
-            },
-            dismissButton = {
-                TextButton(onClick = { shouldShowDialog = false })
-                { Text(text = "No") }
-            }
-        )
-    }
 }

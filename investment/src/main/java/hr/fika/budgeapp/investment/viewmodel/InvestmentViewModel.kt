@@ -15,13 +15,33 @@ import hr.fika.budgeapp.investment.ui.AssetType
 import kotlinx.coroutines.launch
 
 class InvestmentViewModel : ViewModel() {
-    private val _viewState = MutableLiveData<InvestmentUiState>(InvestmentUiState.INITIAL)
+    private val _viewState = MutableLiveData<InvestmentUiState>(InvestmentUiState.LOADING)
     val viewState: LiveData<InvestmentUiState> = _viewState
     private var stocks = listOf<StockBalance>()
     private var crypto = listOf<CryptoBalance>()
 
     private val _period = MutableLiveData("Week")
     val period: LiveData<String> = _period
+
+    init {
+        val walletLinked = checkAssetHolderLinked(AssetType.CRYPTO)
+        val portfolioLinked = checkAssetHolderLinked(AssetType.STOCKS)
+        if (walletLinked) {
+            getCryptoBalances()
+        } else if (portfolioLinked) {
+            getStockBalances()
+        } else {
+            _viewState.postValue(InvestmentUiState.DIALOG(AssetType.STOCKS))
+        }
+    }
+
+    private fun checkAssetHolderLinked(type: AssetType): Boolean {
+        val user = UserManager.user!!
+        return when (type) {
+            AssetType.STOCKS -> user.stockPortfolioId == null
+            AssetType.CRYPTO -> user.cryptoWalletId == null
+        }
+    }
 
     fun linkCryptoWallet() {
         _viewState.postValue(InvestmentUiState.LOADING)
@@ -35,19 +55,23 @@ class InvestmentViewModel : ViewModel() {
         }
     }
 
-    fun getCryptoBalances() {
+    private fun getCryptoBalances() {
         _viewState.postValue(InvestmentUiState.LOADING)
-        if (crypto.isEmpty()) {
-            viewModelScope.launch {
-                val walletId = UserManager.user!!.cryptoWalletId
-                val result = InvestmentRepository.getCryptoBalances(walletId!!)
-                result?.let {
-                    crypto = it
-                    _viewState.postValue(InvestmentUiState.CRYPTO(it))
+        if (UserManager.user!!.cryptoWalletId != null) {
+            if (crypto.isEmpty()) {
+                viewModelScope.launch {
+                    val walletId = UserManager.user!!.cryptoWalletId
+                    val result = InvestmentRepository.getCryptoBalances(walletId!!)
+                    result?.let {
+                        crypto = it
+                        _viewState.postValue(InvestmentUiState.CRYPTO(it))
+                    }
                 }
+            } else {
+                _viewState.postValue(InvestmentUiState.CRYPTO(crypto))
             }
         } else {
-            _viewState.postValue(InvestmentUiState.CRYPTO(crypto))
+            _viewState.postValue(InvestmentUiState.DIALOG(AssetType.CRYPTO))
         }
     }
 
@@ -75,21 +99,24 @@ class InvestmentViewModel : ViewModel() {
         }
     }
 
-    fun getStockBalances() {
-        _viewState.postValue(InvestmentUiState.LOADING)
-        if (stocks.isEmpty()) {
-            viewModelScope.launch {
-                val portfolioId = UserManager.user!!.stockPortfolioId
-                val result = InvestmentRepository.getStockBalances(portfolioId!!)
-                result?.let {
-                    stocks = it
-                    _viewState.postValue(InvestmentUiState.STOCKS(it))
+    private fun getStockBalances() {
+        if (UserManager.user!!.stockPortfolioId != null) {
+            _viewState.postValue(InvestmentUiState.LOADING)
+            if (stocks.isEmpty()) {
+                viewModelScope.launch {
+                    val portfolioId = UserManager.user!!.stockPortfolioId
+                    val result = InvestmentRepository.getStockBalances(portfolioId!!)
+                    result?.let {
+                        stocks = it
+                        _viewState.postValue(InvestmentUiState.STOCKS(it))
+                    }
                 }
+            } else {
+                _viewState.postValue(InvestmentUiState.STOCKS(stocks))
             }
         } else {
-            _viewState.postValue(InvestmentUiState.STOCKS(stocks))
+            _viewState.postValue(InvestmentUiState.DIALOG(AssetType.STOCKS))
         }
-
     }
 
     fun getStockPriceHistory(tag: String, period: PricePeriod = PricePeriod.WEEK) {
